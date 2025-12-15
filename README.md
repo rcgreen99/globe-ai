@@ -10,6 +10,8 @@ GlobeAI is a web application that allows you to view a map of the world and clic
 
 - TypeScript
 - React
+- Next.js
+- Tailwind CSS
 
 ### Backend
 

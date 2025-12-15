@@ -1,0 +1,12 @@
+[project]
+name = "globe-ai"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=0.75.0",
+    "fastapi[standard]>=0.124.4",
+    "pydantic>=2.12.5",
+    "ruff>=0.14.9",
+]
