@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
-source .venv/bin/activate
+set -euo pipefail
 
-uv run fastapi dev backend/main.py --reload
+repo_root="$(cd "$(dirname "$0")/.." && pwd)"
+
+uv run --directory "$repo_root/backend" fastapi dev globe_ai/main.py --reload

@@ -1,11 +1,11 @@
-import os
+from __future__ import annotations
 from pathlib import Path
-from pydantic import BaseModel
 
 from anthropic import AsyncAnthropic
 from jinja2 import Template
+from pydantic import BaseModel
 
-from configurable import Configurable
+from globe_ai.configurable import Configurable
 
 
 class GlobeAgent(Configurable):
@@ -20,7 +20,7 @@ class GlobeAgent(Configurable):
         self.client = AsyncAnthropic()
 
     @classmethod
-    def from_config(cls, config: Config) -> "GlobeAgent":
+    def from_config(cls, config: GlobeAgent.Config) -> GlobeAgent:
         system_prompt = config.system_message_path.read_text()
         user_prompt = config.user_message_path.read_text()
         return cls(system_prompt=system_prompt, user_prompt=user_prompt)

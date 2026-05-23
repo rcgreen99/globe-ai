@@ -1,2 +1,0 @@
-system_message_path = "backend/prompts/system_message.jinja2"
-user_message_path = "backend/prompts/user_message.jinja2"
