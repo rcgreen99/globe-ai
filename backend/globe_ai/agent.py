@@ -1,4 +1,5 @@
 from __future__ import annotations
+from collections.abc import AsyncIterator
 from pathlib import Path
 
 from anthropic import AsyncAnthropic
@@ -37,7 +38,33 @@ class GlobeAgent(Configurable):
 
         messages = conversation.to_messages() if conversation else []
 
-        # Call client with streaming
+        return await self.client.messages.create(
+            max_tokens=1024,
+            messages=messages
+            + [
+                {
+                    "role": "user",
+                    "content": user_input,
+                }
+            ],
+            model="claude-sonnet-4-5-20250929",
+            system=system_prompt,
+        )
+
+    async def stream_response(
+        self,
+        user_input: str,
+        latitude: float,
+        longitude: float,
+        conversation: Conversation | None = None,
+    ) -> AsyncIterator[str]:
+        # Render system prompt
+        system_prompt = Template(self.system_prompt).render(
+            latitude=latitude, longitude=longitude
+        )
+
+        messages = conversation.to_messages() if conversation else []
+
         async with self.client.messages.stream(
             max_tokens=1024,
             messages=messages
@@ -50,13 +77,5 @@ class GlobeAgent(Configurable):
             model="claude-sonnet-4-5-20250929",
             system=system_prompt,
         ) as stream:
-            async for event in stream:
-                if event.type == "text":
-                    print(event.text, end="", flush=True)
-                elif event.type == "content_block_stop":
-                    print()
-                    print("\ncontent block finished accumulating:", event.content_block)
-
-        accumulated = await stream.get_final_message()
-        print("accumulated message: ", accumulated.to_json())
-        return accumulated
+            async for text in stream.text_stream:
+                yield text

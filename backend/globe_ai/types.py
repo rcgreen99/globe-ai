@@ -18,3 +18,10 @@ class Conversation(BaseModel):
             }
             for turn in self.turns
         ]
+
+
+class MessageRequest(BaseModel):
+    user_input: str
+    latitude: float
+    longitude: float
+    conversation: Conversation | None = None
