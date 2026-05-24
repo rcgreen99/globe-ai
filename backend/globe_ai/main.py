@@ -1,5 +1,6 @@
 from fastapi import FastAPI
 from dotenv import load_dotenv
+from globe_ai.types import Conversation
 
 from globe_ai.agent import GlobeAgent
 
@@ -13,8 +14,18 @@ def health_check():
     return {"status": "ok"}
 
 
-@app.get("/describe_location")
-async def describe_location(user_input: str, latitude: float, longitude: float):
+@app.post("/conversations/messages")
+async def send_message(
+    user_input: str,
+    latitude: float,
+    longitude: float,
+    conversation: Conversation | None = None,
+):
     agent = GlobeAgent.from_config_path("globe_ai/configs/agent.toml")
-    agent_response = await agent.generate_response(user_input, latitude, longitude)
-    return {"response": agent_response}
+    response = await agent.generate_response(
+        user_input=user_input,
+        latitude=latitude,
+        longitude=longitude,
+        conversation=conversation,
+    )
+    return {"response": response}

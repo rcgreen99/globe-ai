@@ -14,6 +14,7 @@ export default function App() {
     <div className="App">
       <Globe
         globeImageUrl="https://raw.githubusercontent.com/chrisrzhou/react-globe/main/textures/globe.jpg"
+        selectedCoords={selectedCoords}
         onLocationClick={(coords) => {
           setSelectedCoords(coords);
           setIsChatOpen(true);

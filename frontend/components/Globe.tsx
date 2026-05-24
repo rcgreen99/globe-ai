@@ -1,14 +1,21 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
+import type { GlobeMethods } from "react-globe.gl";
 
 export type GlobeCoords = {
   lat: number;
   lng: number;
 };
+
+type GlobePoint = GlobeCoords & {
+  type: "selected" | "hover";
+};
+
 interface GlobeProps {
   globeImageUrl?: string;
+  selectedCoords?: GlobeCoords | null;
   onLocationClick?: (coords: GlobeCoords) => void;
   width?: number;
   height?: number;
@@ -21,12 +28,27 @@ const GlobeComponent = dynamic(() => import("react-globe.gl"), {
 
 export default function Globe({
   globeImageUrl,
+  selectedCoords,
   onLocationClick,
   ...props
 }: GlobeProps) {
-  const globeRef = useRef<GlobeMethods>();
+  const globeRef = useRef<GlobeMethods | undefined>(undefined);
   const [hoverCoords, setHoverCoords] = useState<GlobeCoords | null>(null);
 
+  // Points
+  const selectedPoint = useMemo(
+    () =>
+      selectedCoords ? { ...selectedCoords, type: "selected" as const } : null,
+    [selectedCoords],
+  );
+  const hoverPoint = useMemo(
+    () => (hoverCoords ? { ...hoverCoords, type: "hover" as const } : null),
+    [hoverCoords],
+  );
+  const points = useMemo(
+    () => [hoverPoint, selectedPoint].filter(Boolean),
+    [hoverPoint, selectedPoint],
+  );
   return (
     <div
       onMouseMove={(event) => {
@@ -35,7 +57,7 @@ export default function Globe({
           event.clientY,
         );
 
-        setHoverCoords(coords);
+        setHoverCoords(coords ?? null);
       }}
       onMouseLeave={() => setHoverCoords(null)}
     >
@@ -43,17 +65,26 @@ export default function Globe({
         ref={globeRef}
         {...props}
         globeImageUrl={globeImageUrl}
-        pointsData={hoverCoords ? [hoverCoords] : []}
+        pointsData={points}
         pointLat="lat"
         pointLng="lng"
-        pointColor={() => "#d3d3d3"}
-        pointAltitude={0.002}
-        pointRadius={0.25}
+        pointColor={(point) =>
+          (point as GlobePoint).type === "selected"
+            ? "rgba(255, 255, 255, 0.70)"
+            : "rgba(255, 255, 255, 0.35)"
+        }
+        pointAltitude={(point) =>
+          (point as GlobePoint).type === "selected" ? 0.05 : 0.002
+        }
+        pointRadius={(point) =>
+          (point as GlobePoint).type === "selected" ? 0.35 : 0.25
+        }
         onGlobeClick={(coords, event) => {
           onLocationClick?.(coords);
         }}
         onPointClick={(point) => {
-          onLocationClick?.(point as GlobeCoords);
+          const { lat, lng } = point as GlobePoint;
+          onLocationClick?.({ lat, lng });
         }}
       />
     </div>
