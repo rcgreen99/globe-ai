@@ -30,7 +30,7 @@ async function onMessageSend(
   userInput: string,
   conversation: Conversation,
 ) {
-  const response = await fetch("/api/describe_location", {
+  const response = await fetch("/api/conversations/messages", {
     method: "POST",
     headers: {
       "content-type": "application/json",
