@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import ConversationView from "./Chat/ConversationView";
 
 const DEFAULT_PANEL_WIDTH = 384;
+const COLLAPSED_PANEL_WIDTH = 56;
 const MIN_PANEL_WIDTH = 320;
 const MAX_PANEL_WIDTH_RATIO = 0.9;
 
@@ -160,28 +161,26 @@ export default function ChatSidePanel({
 
   return (
     <aside
-      className={`relative z-10 flex h-screen shrink-0 flex-col overflow-hidden border-l border-neutral-800 bg-neutral-950 shadow-xl text-neutral-100 ${
-        isResizing ? "" : "transition-[width,padding] duration-300 ease-in-out"
-      } ${isExpanded ? "max-w-[90vw] p-4" : "w-14 p-2"}`}
-      style={isExpanded ? { width: panelWidth } : undefined}
+      className={`relative z-10 flex h-screen shrink-0 flex-col overflow-hidden border-l border-neutral-800 bg-neutral-950 shadow-xl text-neutral-100 will-change-[width,padding] ${
+        isResizing ? "" : "transition-[width,padding] duration-300 ease-out"
+      } ${isExpanded ? "max-w-[90vw] p-4" : "p-2"}`}
+      style={{ width: isExpanded ? panelWidth : COLLAPSED_PANEL_WIDTH }}
     >
-      {isExpanded && (
-        <div
-          className="absolute inset-y-0 left-0 w-1 cursor-col-resize touch-none transition hover:bg-neutral-600"
-          onPointerDown={() => setIsResizing(true)}
-          role="separator"
-          aria-orientation="vertical"
-          aria-label="Resize chat panel"
-        />
-      )}
-      <header
-        className={`flex items-center ${
-          isExpanded ? "justify-between" : "justify-center"
+      <div
+        className={`absolute inset-y-0 left-0 w-1 cursor-col-resize touch-none transition-colors hover:bg-neutral-600 ${
+          isExpanded ? "" : "pointer-events-none"
         }`}
-      >
+        onPointerDown={() => setIsResizing(true)}
+        role="separator"
+        aria-orientation="vertical"
+        aria-label="Resize chat panel"
+      />
+      <header className="flex items-center pr-10">
         <div
-          className={`min-w-0 transition-opacity duration-150 ${
-            isExpanded ? "opacity-100 delay-150" : "hidden opacity-0"
+          className={`min-w-0 transition-[opacity,transform] duration-200 ${
+            isExpanded
+              ? "translate-x-0 opacity-100 delay-100"
+              : "-translate-x-2 opacity-0"
           }`}
         >
           <h2 className="truncate text-sm font-semibold text-neutral-100">
@@ -194,7 +193,7 @@ export default function ChatSidePanel({
         <button
           type="button"
           onClick={onToggle}
-          className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm text-neutral-400 transition hover:bg-neutral-800 hover:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-400"
+          className="absolute right-3 top-3 flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-sm text-neutral-400 transition hover:bg-neutral-800 hover:text-neutral-100 focus:outline-none focus:ring-2 focus:ring-neutral-400"
           aria-label={isExpanded ? "Collapse chat" : "Expand chat"}
           title={isExpanded ? "Collapse chat" : "Expand chat"}
         >
