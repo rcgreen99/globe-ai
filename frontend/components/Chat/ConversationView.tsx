@@ -1,4 +1,5 @@
 import type { Conversation, Turn } from "@/components/ChatSidePanel";
+import Markdown from "react-markdown";
 
 type ConversationViewProps = {
   conversation: Conversation;
@@ -10,11 +11,11 @@ function TurnView({ turn }: { turn: Turn }) {
     <div className={`flex ${isUser ? "justify-end" : "justify-start"}`}>
       {isUser ? (
         <div className="max-w-[85%] rounded-lg bg-neutral-700 p-2 text-neutral-100 shadow-sm">
-          <div>{turn.content}</div>
+          <Markdown>{turn.content}</Markdown>
         </div>
       ) : (
         <div className="max-w-[85%] rounded-lg border border-neutral-800 bg-neutral-900 p-2 text-neutral-100 shadow-sm">
-          <div>{turn.content}</div>
+          <Markdown>{turn.content}</Markdown>
         </div>
       )}
     </div>
